@@ -1,7 +1,9 @@
 ---
 title: "Statistics and Predictive Analytics, Lab 2"
 author: "Swati Singh"
-output:  html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 Welcome to Lab 2!  
