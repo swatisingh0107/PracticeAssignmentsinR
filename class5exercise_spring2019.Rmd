@@ -1,0 +1,104 @@
+---
+title: "Class 5 Exercise"
+author: "Swati Singh"
+date: "3/19/2019"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(knitr)
+library(caret)
+library(MASS)
+
+data(Boston)
+
+```
+
+## Scenario
+
+This is a variant of the final, optional question on Lab 2 (question 9).  
+
+Recall that you have been using the Boston housing dataset to model median home price (medv) as a function of (among other variables) air pollution (nox).
+
+Here is question 9:  
+
+Using the full model calculate the value of a typical home at a low level of `nox` and at a high level of `nox`.  It is up to you to define what counts as "low" or "high."  Your goal should be to complete the following sentence:  "When `nox` increases from a low level (defined by ...) to a high level (defined by ...) we observe an increase/decrease in median home values of, on average, ... dollars."
+
+Let's add a couple of details to this:
+
+1. Use a linear regression to model log(medv).
+2. Compute a 95% confidence interval for your estimate of the impact of pollution on median home value. Why? We know that our point estimate will be wrong.  So it is important to include uncertainty in communicating results.  Add this to the above sentence: "plus or minus ... dollars."
+
+Note: The "full model" includes all of the predictors:  crim, zn, indus, chas, nox, rm, age, dis, rad, tax, ptratio, black and lstat.
+
+```{r}
+?Boston
+
+str(Boston)
+```
+
+## Your work
+
+```{r}
+lm(log(medv)~.,Boston) %>%
+  summary
+
+model<-lm(log(medv)~rm,Boston)
+fd<-data.frame()
+fd<-predict(model,newdata=data.frame(rm=c(5.3,7.59)),
+        interval="confidence")
+
+fd
+
+```
+
+```{r}
+full<-lm(medv~.,Boston)
+quantile(Boston$nox,probs=c(0.05,0.95))
+prediction_df<-data.frame(nox=c(0.41,.74),
+                          crim=median(Boston$crim),
+                       zn=median(Boston$zn),
+                       indus=median(Boston$indus),
+                       chas=0,
+                       rm=median(Boston$rm),
+                       age=median(Boston$age),
+                       dis=median(Boston$dis),
+                       rad=median(Boston$rad),
+                       tax=median(b$tax),
+                       ptratio=median(Boston$ptratio),
+                       black=median(Boston$black),
+                       lstat=median(Boston$lstat),
+                       medv=median(Boston$medv))
+
+predict(full,newdata=prediction_df)[2]-predict(full,newdata=prediction_df)[1]
+
+print(paste("Keeping all other parameters constant and changing the nox levels from low to high, average price decreases by ",1000*round(predict(full,newdata=prediction_df)[2]-predict(full,newdata=prediction_df)[1],1)))
+```
+
+
+```{r}
+logmodel<-lm(log(medv)~.,Boston)
+quantile(Boston$nox,probs=c(0.05,0.95))
+prediction_df<-data.frame(nox=c(0.41,.74),
+                          crim=median(Boston$crim),
+                       zn=median(Boston$zn),
+                       indus=median(Boston$indus),
+                       chas=0,
+                       rm=median(Boston$rm),
+                       age=median(Boston$age),
+                       dis=median(Boston$dis),
+                       rad=median(Boston$rad),
+                       tax=median(b$tax),
+                       ptratio=median(Boston$ptratio),
+                       black=median(Boston$black),
+                       lstat=median(Boston$lstat),
+                       medv=median(Boston$medv))
+
+exp(predict(logmodel,newdata=prediction_df)[2]-predict(logmodel,newdata=prediction_df)[1])
+
+print(paste("Keeping all other parameters constant and changing the nox levels from low to high, average price decreases by ",1000*abs(round(exp(predict(logmodel,newdata=prediction_df)[2])*mean(exp(residuals(logmodel)))-exp(predict(logmodel,newdata=prediction_df)[1])*mean(exp(residuals(logmodel))),0))))
+
+
+```
